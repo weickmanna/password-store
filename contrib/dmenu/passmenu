@@ -3,9 +3,13 @@
 shopt -s nullglob globstar
 
 typeit=0
+typeitFully=0
 if [[ $1 == "--type" ]]; then
 	typeit=1
 	shift
+elif [[ $1 == "--type-fully" ]]; then
+    typeitFully=1
+    shift
 fi
 
 prefix=${PASSWORD_STORE_DIR-~/.password-store}
@@ -17,9 +21,26 @@ password=$(printf '%s\n' "${password_files[@]}" | dmenu "$@")
 
 [[ -n $password ]] || exit
 
-if [[ $typeit -eq 0 ]]; then
-	pass show -c "$password" 2>/dev/null
-else
-	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } |
+
+type_username() {
+    pass show "$password" | head -n 2 | tail -n 1 | { IFS= read -r pass; printf %s "$pass"; } |
 		xdotool type --clearmodifiers --file -
+}
+
+type_password() {
+    pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } |
+		xdotool type --clearmodifiers --file -
+}
+
+
+if [[ $typeit -eq 0 ]] && [[ $typeitFully -eq 0 ]]; then
+	pass show -c "$password" 2>/dev/null
+elif [[ $typeit -eq 1 ]]; then
+	type_password
+elif [[ $typeitFully -eq 1 ]]; then
+	type_username
+	xdotool key Tab
+	type_password
+	xdotool key Tab
+	xdotool key Return
 fi

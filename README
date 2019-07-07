@@ -1,3 +1,11 @@
+*** FORK NOTES
+
+- contrib/dmenu/passmenu
+-- added alternative parameter `--type-fully` that will first type the username
+   (whatever is found on second line), then a Tab key, followed by the password,
+   another Tab key and finally a Return key
+
+
 ======================
 Simple Password Store
 by Jason Donenfeld
